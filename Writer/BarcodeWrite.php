@@ -25,6 +25,7 @@ declare(strict_types=1);
 
 namespace BaksDev\Barcode\Writer;
 
+use InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
@@ -71,25 +72,30 @@ final class BarcodeWrite
     }
 
     /** Указать относительный директории upload путь  */
-    public function generate(string $path): void
+    public function generate(string $path): string|false
     {
+        if(empty($this->text))
+        {
+            throw new InvalidArgumentException('Текст штрих-кода не может быть пустым');
+        }
+
         $process = new Process([
             '/usr/lib/zxing-cpp/example/ZXingWriter',
             $this->type,
-            '018d464c-26cb-7fcb-aa15-ba9ec661740e',
+            $this->text,
             $this->upload.DIRECTORY_SEPARATOR.$path.DIRECTORY_SEPARATOR.strtolower($this->type).'.'.$this->format
         ]);
 
         try
         {
-            $process->mustRun();
-
-            echo $process->getOutput();
+            $process->run();
+            return $process->getOutput();
         }
         catch(ProcessFailedException $exception)
         {
-            echo $exception->getMessage();
+
         }
 
+        return false;
     }
 }
