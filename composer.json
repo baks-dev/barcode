@@ -24,6 +24,7 @@
     "UPC-A",
     "UPC-E",
     "baksdev"
+
   ],
   "license": "MIT",
   "type": "symfony-bundle",

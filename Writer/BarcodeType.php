@@ -28,29 +28,16 @@ namespace BaksDev\Barcode\Writer;
 enum BarcodeType: string
 {
     case Aztec = 'Aztec';
-
     case Codabar = 'Codabar';
-
     case Code39 = 'Code39';
-
     case Code93 = 'Code93';
-
     case Code128 = 'Code128';
-
     case DataMatrix = 'DataMatrix';
-
     case EAN8 = 'EAN-8';
-
     case EAN13 = 'EAN-13';
-
     case ITF = 'ITF';
-
     case PDF417 = 'PDF417';
-
     case QRCode = 'QRCode';
-
     case UPCA = 'UPC-A';
-
     case UPCE = 'UPC-E';
-
 }

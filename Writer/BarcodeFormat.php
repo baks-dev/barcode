@@ -28,8 +28,6 @@ namespace BaksDev\Barcode\Writer;
 enum BarcodeFormat: string
 {
     case PNG = 'png';
-
     case JPG = 'jpg';
-
     case SVG = 'svg';
 }
