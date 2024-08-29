@@ -24,7 +24,6 @@
     "UPC-A",
     "UPC-E",
     "baksdev"
-
   ],
   "license": "MIT",
   "type": "symfony-bundle",
@@ -46,6 +45,16 @@
     "psr-4": {
       "BaksDev\\Barcode\\": ""
     }
+  },
+  "scripts": {
+    "pre-update-cmd": [
+      "echo 'Внимание: chmod +x .....PATH_TO_PROJECT..../vendor/baks-dev/barcode/Writer/Generate'",
+      "echo 'Внимание: chmod +x .....PATH_TO_PROJECT..../vendor/baks-dev/barcode/Reader/Decode'"
+    ],
+    "pre-install-cmd": [
+      "echo 'Внимание: chmod +x .....PATH_TO_PROJECT..../vendor/baks-dev/barcode/Writer/Generate'",
+      "echo 'Внимание: chmod +x .....PATH_TO_PROJECT..../vendor/baks-dev/barcode/Reader/Decode'"
+    ]
   },
   "config": {
     "sort-packages": true,
