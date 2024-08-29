@@ -25,17 +25,16 @@ declare(strict_types=1);
 
 namespace BaksDev\Barcode\Writer\Tests;
 
-use BaksDev\Barcode\Reader\BarcodeRead;
+use BaksDev\Barcode\BaksDevBarcodeBundle;
 use BaksDev\Barcode\Writer\BarcodeFormat;
 use BaksDev\Barcode\Writer\BarcodeType;
 use BaksDev\Barcode\Writer\BarcodeWrite;
-use BaksDev\Core\Doctrine\DBALQueryBuilder;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
 
 /**
  * @group barcode
+ *
  */
 #[When(env: 'test')]
 class BarcodeWriteTest extends KernelTestCase
@@ -87,7 +86,10 @@ class BarcodeWriteTest extends KernelTestCase
 
                 if($result === false)
                 {
-                    echo sprintf('Ошибка генерации кода %s %s', $type, $format).PHP_EOL;
+                    echo sprintf('Ошибка генерации кода %s %s', $type->value, $format->value).PHP_EOL;
+                    echo sprintf('chmod +x '.BaksDevBarcodeBundle::PATH.'Writer/Generate').PHP_EOL;
+                    echo sprintf('chmod +x '.BaksDevBarcodeBundle::PATH.'Reader/Decode').PHP_EOL;
+
                 }
 
                 self::assertTrue($result);
