@@ -26,7 +26,10 @@ declare(strict_types=1);
 namespace BaksDev\Barcode\Writer;
 
 use InvalidArgumentException;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 
@@ -36,14 +39,19 @@ use Symfony\Component\Process\Process;
  */
 final class BarcodeWrite
 {
+    private const COMMAND = '';
+
     private string $format;
 
     private string $text;
 
     private string $type;
+    private LoggerInterface $logger;
 
     public function __construct(
-        #[Autowire('%kernel.project_dir%/public/upload/')] private readonly string $upload,
+        #[Autowire('%kernel.project_dir%')] private readonly string $upload,
+        private readonly Filesystem $filesystem,
+        LoggerInterface $barcodeLogger
     ) {
         /** По умолчанию генерируемый QRCode */
         $this->type = (BarcodeType::QRCode)->value;
@@ -51,6 +59,7 @@ final class BarcodeWrite
         /** По умолчанию генерируемый форма SVG */
         $this->format = (BarcodeFormat::SVG)->value;
 
+        $this->logger = $barcodeLogger;
     }
 
     public function text(string|int $text): self
@@ -72,28 +81,54 @@ final class BarcodeWrite
     }
 
     /** Указать относительный директории upload путь  */
-    public function generate(string $path): string|false
+    public function generate(string $path): bool
     {
         if(empty($this->text))
         {
             throw new InvalidArgumentException('Текст штрих-кода не может быть пустым');
         }
 
+        $upload = implode(DIRECTORY_SEPARATOR, [
+            $this->upload,
+            'public',
+            'upload',
+            $path,
+            ''
+        ]);
+
+        /** Если отсутствует директория - создаем */
+        $isExistsDir = $this->filesystem->exists($upload);
+
+        if($isExistsDir === false)
+        {
+            $this->filesystem->mkdir($upload);
+        }
+
+        $filename = strtolower($this->type).'.'.$this->format;
+
+        $isExistsFile = $this->filesystem->exists($upload.$filename);
+
+        if($isExistsFile)
+        {
+            /** Удаляем файл для генерации нового */
+            $this->filesystem->remove($upload.$filename);
+        }
+
         $process = new Process([
-            '/usr/lib/zxing-cpp/example/ZXingWriter',
+            __DIR__.DIRECTORY_SEPARATOR.'Generate',
             $this->type,
             $this->text,
-            $this->upload.DIRECTORY_SEPARATOR.$path.DIRECTORY_SEPARATOR.strtolower($this->type).'.'.$this->format
+            $upload.$filename
         ]);
 
         try
         {
-            $process->run();
-            return $process->getOutput();
+            $process->mustRun();
+            return true;
         }
         catch(ProcessFailedException $exception)
         {
-
+            $this->logger->critical($exception->getMessage());
         }
 
         return false;

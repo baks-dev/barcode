@@ -25,6 +25,7 @@ declare(strict_types=1);
 
 namespace BaksDev\Barcode\Writer\Tests;
 
+use BaksDev\Barcode\Reader\BarcodeRead;
 use BaksDev\Barcode\Writer\BarcodeFormat;
 use BaksDev\Barcode\Writer\BarcodeType;
 use BaksDev\Barcode\Writer\BarcodeWrite;
@@ -39,34 +40,58 @@ use Symfony\Component\DependencyInjection\Attribute\When;
 #[When(env: 'test')]
 class BarcodeWriteTest extends KernelTestCase
 {
-    private const string TEXT = '28c0be83-68f3-7911-ac45-a18e8efe5c0a';
+    private const string TEXT = '9ff0ff18-f3bc-7ebc-aa9c-378ff10d1e60';
 
     private static BarcodeWrite $BarcodeWrite;
 
     public static function setUpBeforeClass(): void
     {
-        /** @var EntityManagerInterface $em */
         self::$BarcodeWrite = self::getContainer()->get(BarcodeWrite::class);
-
     }
 
 
-    public function testUseCase(): void
+    public function testAztecSVG(): void
     {
         $path = ['barcode', 'test'];
 
-        /** @see BarcodeWriteDTO */
-        $BarcodeWrite = self::$BarcodeWrite;
-        $result = $BarcodeWrite
-            ->text(self::TEXT)
-            ->format(BarcodeFormat::SVG)
-            ->type(BarcodeType::QRCode)
-            ->generate(implode(DIRECTORY_SEPARATOR, $path));
+        foreach(BarcodeType::cases() as $type)
+        {
+            $text = match ($type->value)
+            {
+                'Aztec' => self::TEXT, // произвольно
+                'Codabar' => 'A12345B', // должен начинаться и заканчиваться с символа начала/конца, например: `A123456B`
+                'Code39' => self::TEXT, // можно использовать пробелы, но максимальная длина — 43 символа
+                'Code93' => self::TEXT, // допускает символы: A-Z, 0-9 и некоторые специальные символы
+                'Code128' => self::TEXT, // поддерживает все ASCII символы
+                'DataMatrix' => self::TEXT, // произвольно до до 3116 символов
+                'EAN-8' => '1234567', // должен состоять из 7 цифр
+                'EAN-13' => '123456789012', // должен состоять из 12 цифр
+                'ITF' => '023456789012', // вторая цифра может быть нулем или одним из других заданных значений
+                'PDF417' => self::TEXT, // можно использовать произвольные строки
+                'QRCode' => self::TEXT, // можно закодировать URL, текст или другую информацию
+                'UPC-A' => '012345678905', // должен состоять из 12 цифр, включает контрольную цифру
+                'UPC-E' => '0123456' // должен состоять из 6 значащих цифр плюс 2 нуля, чтобы достичь 8 знаков
+            };
 
 
-        dd($result);
+            foreach(BarcodeFormat::cases() as $format)
+            {
+                /** @see BarcodeWriteDTO */
+                $BarcodeWrite = self::$BarcodeWrite;
 
+                $result = $BarcodeWrite
+                    ->text($text)
+                    ->format($format)
+                    ->type($type)
+                    ->generate(implode(DIRECTORY_SEPARATOR, $path));
 
+                if($result === false)
+                {
+                    echo sprintf('Ошибка генерации кода %s %s', $type, $format).PHP_EOL;
+                }
+
+                self::assertTrue($result);
+            }
+        }
     }
-
 }
