@@ -53,6 +53,7 @@ final class BarcodeRead
      */
     public function decode(string $imgSource): self
     {
+        $this->error = false;
 
         /** Проверяем что файл существует по указанному абсолютному пути */
         $isExist = $this->filesystem->exists($imgSource);
@@ -214,6 +215,7 @@ final class BarcodeRead
     }
 
 
+    /** Метод конвертируем SVG в PNG */
     private function convertSVG(string $path): string|false
     {
         // Проверяем, что Imagick установлен
