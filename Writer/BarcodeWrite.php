@@ -117,7 +117,7 @@ final class BarcodeWrite
             $upload = $path;
         }
 
-        $filename = $filename.'.'.$this->format ?: strtolower($this->type).'.'.$this->format;
+        $filename = $filename ? $filename.'.'.$this->format : strtolower($this->type).'.'.$this->format;
 
         $isExistsFile = $this->filesystem->exists($upload.$filename);
 

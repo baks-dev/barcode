@@ -58,7 +58,6 @@ final class BarcodeRead
         /** Проверяем что файл существует по указанному абсолютному пути */
         $isExist = $this->filesystem->exists($imgSource);
 
-
         if($isExist === true)
         {
             $path = $imgSource;
