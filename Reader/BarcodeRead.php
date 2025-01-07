@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,7 @@ declare(strict_types=1);
 
 namespace BaksDev\Barcode\Reader;
 
+use ErrorException;
 use Imagick;
 use ImagickPixel;
 use Psr\Log\LoggerInterface;
@@ -44,7 +45,8 @@ final class BarcodeRead
         #[Autowire('%kernel.project_dir%')] private readonly string $upload,
         private readonly Filesystem $filesystem,
         LoggerInterface $barcodeLogger
-    ) {
+    )
+    {
         $this->logger = $barcodeLogger;
     }
 
@@ -98,8 +100,6 @@ final class BarcodeRead
         /** Если файла не существует - пробуем применить BLOB как png */
         else
         {
-
-
             $this->error = true;
 
             $path = false;
@@ -109,9 +109,7 @@ final class BarcodeRead
 
         if($path === false)
         {
-            dump($fileType);
-
-            dd('FALSE');
+            throw new ErrorException(sprintf('Неизвестный тип %s', $fileType));
         }
 
 
@@ -188,7 +186,6 @@ final class BarcodeRead
         }
 
         $lines = explode(PHP_EOL, trim($result));
-
 
 
         // Обрабатываем каждую строку
