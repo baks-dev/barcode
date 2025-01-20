@@ -30,6 +30,7 @@ use Imagick;
 use ImagickPixel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
 
@@ -37,18 +38,14 @@ final class BarcodeRead
 {
     private bool $error = false;
 
-    private LoggerInterface $logger;
-
     private array $decode = [];
 
     public function __construct(
-        #[Autowire('%kernel.project_dir%')] private readonly string $upload,
+        #[Autowire('%kernel.project_dir%')] private string $upload,
+        #[Target('barcodeLogger')] private readonly LoggerInterface $logger,
         private readonly Filesystem $filesystem,
-        LoggerInterface $barcodeLogger
-    )
-    {
-        $this->logger = $barcodeLogger;
-    }
+
+    ) {}
 
     /**
      * принимает относительный директории проекта путь файла
