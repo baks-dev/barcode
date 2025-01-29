@@ -44,11 +44,10 @@ final class BarcodeRead
         #[Autowire('%kernel.project_dir%')] private string $upload,
         #[Target('barcodeLogger')] private readonly LoggerInterface $logger,
         private readonly Filesystem $filesystem,
-
     ) {}
 
     /**
-     * принимает относительный директории проекта путь файла
+     * Принимает относительный директории проекта путь файла
      */
     public function decode(string $imgSource): self
     {
@@ -86,7 +85,7 @@ final class BarcodeRead
 
             $path = match ($fileType)
             {
-                'image/svg+xml' => $this->convertSVG($path),
+                'image/svg+xml', 'application/pdf' => $this->convertToPng($path),
                 'image/png' => $path,
                 'image/jpeg' => $path,
                 default => false
@@ -210,8 +209,10 @@ final class BarcodeRead
     }
 
 
-    /** Метод конвертируем SVG в PNG */
-    private function convertSVG(string $path): string|false
+    /**
+     * Метод конвертируем PNG
+     */
+    private function convertToPng(string $path): string|false
     {
         // Проверяем, что Imagick установлен
         if(!extension_loaded('imagick'))
@@ -225,7 +226,7 @@ final class BarcodeRead
         $convert = $path.'.png';
 
         $imagick = new Imagick();
-        $imagick->setResolution(400, 400);
+        $imagick->setResolution(200, 200);
 
         $imagick->readImage($path);
 
