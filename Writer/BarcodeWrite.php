@@ -48,6 +48,10 @@ final class BarcodeWrite
 
     private string $type;
 
+    private string $path;
+
+    private string $filename;
+
     public function __construct(
         #[Autowire('%kernel.project_dir%')] private readonly string $upload,
         #[Target('barcodeLogger')] private readonly LoggerInterface $logger,
@@ -79,7 +83,9 @@ final class BarcodeWrite
         return $this;
     }
 
-    /** Указать относительный директории upload путь  */
+    /**
+     * Указать относительный директории upload путь
+     */
     public function generate(string $path, string|bool $filename = false): bool
     {
         if(empty($this->text))
@@ -95,7 +101,7 @@ final class BarcodeWrite
         {
             /** Если директории не найдено - проверяем относительный директории upload путь */
 
-            $upload = implode(DIRECTORY_SEPARATOR, [
+            $this->path = implode(DIRECTORY_SEPARATOR, [
                 $this->upload,
                 'public',
                 'upload',
@@ -104,33 +110,43 @@ final class BarcodeWrite
             ]);
 
             /** Если отсутствует директория - создаем */
-            $isExistsDir = $this->filesystem->exists($upload);
+            $isExistsDir = $this->filesystem->exists($this->path);
 
             if($isExistsDir === false)
             {
-                $this->filesystem->mkdir($upload);
+                $this->filesystem->mkdir($this->path);
             }
         }
         else
         {
-            $upload = $path;
+            $this->path = $path;
         }
 
-        $filename = $filename ? $filename.'.'.$this->format : strtolower($this->type).'.'.$this->format;
+        $this->filename = $filename ? $filename.'.'.$this->format : strtolower($this->type).'.'.$this->format;
 
-        $isExistsFile = $this->filesystem->exists($upload.$filename);
+        $isExistsFile = $this->filesystem->exists($this->path.$this->filename);
 
         if($isExistsFile)
         {
             /** Удаляем файл для генерации нового */
-            $this->filesystem->remove($upload.$filename);
+            $this->filesystem->remove($this->path.$this->filename);
         }
 
         $process = new Process([
             __DIR__.DIRECTORY_SEPARATOR.'Generate',
+
+            '-size', //      Размер сгенерированного изображения
+            '25',
+            //'-eclevel', //   Error correction level, [0-8]
+            //'-binary', //    Интерпретировать <Text> как имя файла, содержащее двоичные данные
+            '-noqz', //      Печата штрих -кода с тихой зоной
+            //'-hrt', //       Распечатайте читаемый текст человека под штрих -кодом (если поддерживается)
+
+
+
             $this->type,
             $this->text,
-            $upload.$filename
+            $this->path.$this->filename
         ]);
 
         try
@@ -144,5 +160,23 @@ final class BarcodeWrite
         }
 
         return false;
+    }
+
+    public function render(): string
+    {
+        return $this->filesystem->readFile($this->path.$this->filename);
+    }
+
+
+    /** Метод возвращает пусть к файлу */
+    public function getPath(): string
+    {
+        return $this->path;
+    }
+
+    public function remove(): self
+    {
+        $this->filesystem->remove($this->path.$this->filename);
+        return $this;
     }
 }
