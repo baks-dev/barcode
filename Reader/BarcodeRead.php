@@ -187,7 +187,6 @@ final class BarcodeRead
         // Обрабатываем каждую строку
         foreach($lines as $line)
         {
-
             // Разделяем строку по первому двоеточию
             [$key, $value] = explode(':', $line, 2);
             $decode[trim($key)] = trim($value);
@@ -226,9 +225,9 @@ final class BarcodeRead
         $convert = $path.'.png';
 
         $imagick = new Imagick();
-        $imagick->setResolution(200, 200);
-
+        $imagick->setResolution(500, 500);
         $imagick->readImage($path);
+        $imagick->borderImage(new ImagickPixel("white"), 5, 5);
 
         // Установите цвет фона
         $imagick->setImageBackgroundColor(new ImagickPixel('white'));
