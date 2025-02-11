@@ -29,7 +29,6 @@ use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\Target;
-use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
@@ -57,12 +56,22 @@ final class BarcodeWrite
         #[Target('barcodeLogger')] private readonly LoggerInterface $logger,
         private readonly Filesystem $filesystem,
 
-    ) {
+    )
+    {
         /** По умолчанию генерируемый QRCode */
         $this->type = (BarcodeType::QRCode)->value;
 
         /** По умолчанию генерируемый форма SVG */
         $this->format = (BarcodeFormat::SVG)->value;
+
+        /** По умолчанию генерируемый форма SVG */
+        $this->path = implode(DIRECTORY_SEPARATOR, [
+            $this->upload,
+            'public',
+            'upload',
+            'barcode',
+            'tmp'
+        ]);
     }
 
     public function text(string|int $text): self
@@ -95,7 +104,6 @@ final class BarcodeWrite
 
 
         $isExistsDir = $this->filesystem->exists($path);
-
 
         if($isExistsDir === false)
         {
@@ -132,22 +140,14 @@ final class BarcodeWrite
             $this->filesystem->remove($this->path.$this->filename);
         }
 
-        $process = new Process([
-            __DIR__.DIRECTORY_SEPARATOR.'Generate',
+        // Generate [-size <width/height>] [-eclevel <level>] [-noqz] [-hrt] <format> <text> <output>
 
-            '-size', //      Размер сгенерированного изображения
-            '25',
-            //'-eclevel', //   Error correction level, [0-8]
-            //'-binary', //    Интерпретировать <Text> как имя файла, содержащее двоичные данные
-            '-noqz', //      Печата штрих -кода с тихой зоной
-            //'-hrt', //       Распечатайте читаемый текст человека под штрих -кодом (если поддерживается)
+        $command[] = __DIR__.DIRECTORY_SEPARATOR.'Generate';
+        $command[] = $this->type;
+        $command[] = $this->text;
+        $command[] = $this->path.$this->filename;
 
-
-
-            $this->type,
-            $this->text,
-            $this->path.$this->filename
-        ]);
+        $process = new Process($command);
 
         try
         {

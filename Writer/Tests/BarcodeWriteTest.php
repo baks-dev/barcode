@@ -31,6 +31,7 @@ use BaksDev\Barcode\Writer\BarcodeType;
 use BaksDev\Barcode\Writer\BarcodeWrite;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @group barcode
@@ -51,7 +52,7 @@ class BarcodeWriteTest extends KernelTestCase
 
     public function testAztecSVG(): void
     {
-        $path = ['barcode', 'test'];
+        $path = ['barcode', 'tmp'];
 
         foreach(BarcodeType::cases() as $type)
         {
@@ -73,15 +74,17 @@ class BarcodeWriteTest extends KernelTestCase
             };
 
 
+            /** @see BarcodeWriteDTO */
+            $BarcodeWrite = self::$BarcodeWrite;
+
+            //new Filesystem()->remove($BarcodeWrite->getPath());
+
             foreach(BarcodeFormat::cases() as $format)
             {
-                /** @see BarcodeWriteDTO */
-                $BarcodeWrite = self::$BarcodeWrite;
-
                 $result = $BarcodeWrite
                     ->text($text)
                     ->format($format)
-                    ->type($type)
+                    ->type($type) // BarcodeType::Code128
                     ->generate(implode(DIRECTORY_SEPARATOR, $path));
 
                 if($result === false)
