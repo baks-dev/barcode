@@ -95,14 +95,14 @@ final class BarcodeWrite
     /**
      * Указать относительный директории upload путь
      */
-    public function generate(string $path, string|bool $filename = false): bool
+    public function generate(string|false $path = false, string|false $filename = false): bool
     {
         if(empty($this->text))
         {
             throw new InvalidArgumentException('Текст штрих-кода не может быть пустым');
         }
 
-
+        $path ?: $path = $this->path;
         $isExistsDir = $this->filesystem->exists($path);
 
         if($isExistsDir === false)
