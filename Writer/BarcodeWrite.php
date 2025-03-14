@@ -164,6 +164,12 @@ final class BarcodeWrite
 
     public function render(): string
     {
+
+        if(false === $this->filesystem->exists($this->path.$this->filename))
+        {
+            return '';
+        }
+
         return $this->filesystem->readFile($this->path.$this->filename);
     }
 
