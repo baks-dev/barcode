@@ -70,7 +70,8 @@ final class BarcodeWrite
             'public',
             'upload',
             'barcode',
-            'tmp'
+            'tmp',
+            ''
         ]);
     }
 
@@ -102,14 +103,14 @@ final class BarcodeWrite
             throw new InvalidArgumentException('Текст штрих-кода не может быть пустым');
         }
 
-        $path ?: $path = $this->path;
+        $path ? $this->path = $path : $path = $this->path;
         $isExistsDir = $this->filesystem->exists($path);
 
         if($isExistsDir === false)
         {
             /** Если директории не найдено - проверяем относительный директории upload путь */
 
-            $this->path = implode(DIRECTORY_SEPARATOR, [
+            $relative = implode(DIRECTORY_SEPARATOR, [
                 $this->upload,
                 'public',
                 'upload',
@@ -117,12 +118,12 @@ final class BarcodeWrite
                 ''
             ]);
 
-            /** Если отсутствует директория - создаем */
-            $isExistsDir = $this->filesystem->exists($this->path);
+            /** Если отсутствует относительная директория - создаем по абсолютному пути */
+            $isExistsDir = $this->filesystem->exists($relative);
 
             if($isExistsDir === false)
             {
-                $this->filesystem->mkdir($this->path);
+                $this->filesystem->mkdir($path);
             }
         }
         else
@@ -130,7 +131,7 @@ final class BarcodeWrite
             $this->path = $path;
         }
 
-        $this->filename = $filename ? $filename.'.'.$this->format : strtolower($this->type).'.'.$this->format;
+        $this->filename = $filename ? $filename.'.'.$this->format : md5($this->text).'.'.$this->format;
 
         $isExistsFile = $this->filesystem->exists($this->path.$this->filename);
 
