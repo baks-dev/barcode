@@ -52,7 +52,7 @@ class BarcodeWriteTest extends KernelTestCase
 
     public function testAztecSVG(): void
     {
-        $path = ['barcode', 'tmp'];
+        $path = ['barcode', 'tmp', ''];
 
         foreach(BarcodeType::cases() as $type)
         {
@@ -85,7 +85,7 @@ class BarcodeWriteTest extends KernelTestCase
                     ->text($text)
                     ->format($format)
                     ->type($type) // BarcodeType::Code128
-                    ->generate(implode(DIRECTORY_SEPARATOR, $path));
+                    ->generate(implode(DIRECTORY_SEPARATOR, $path), strtolower($type->value));
 
                 if($result === false)
                 {

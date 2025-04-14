@@ -47,7 +47,9 @@ final class BarcodeRead
     ) {}
 
     /**
-     * Принимает относительный директории проекта путь файла
+     * Принимает абсолютный либо относительно директории
+     * <project_dir>/public/upload/barcode/tmp
+     * проекта путь к файлу
      */
     public function decode(string $imgSource): self
     {
@@ -68,13 +70,14 @@ final class BarcodeRead
                 $this->upload,
                 'public',
                 'upload',
+                'barcode',
+                'tmp',
                 $imgSource,
             ]);
 
             /** Если передан относительный директории проекта путь файла */
             $isExist = $this->filesystem->exists($path);
         }
-
 
         if($isExist === true)
         {

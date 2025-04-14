@@ -73,13 +73,12 @@ class BarcodeReadTest extends KernelTestCase
 
             foreach(BarcodeFormat::cases() as $format)
             {
-                $path = ['barcode', 'tmp', strtolower($type->value).'.'.$format->value];
-
                 $decode = $BarcodeRead
-                    ->decode(implode(DIRECTORY_SEPARATOR, $path))
+                    ->decode(strtolower($type->value).'.'.$format->value)
                     ->getText();
 
                 self::assertSame($text, $decode, $text.':'.$type->value.'.'.$format->value);
+
             }
         }
     }
