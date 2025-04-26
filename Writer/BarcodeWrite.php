@@ -147,9 +147,17 @@ final class BarcodeWrite
             $this->filesystem->remove($this->path.$this->filename);
         }
 
+
         // Generate [-size <width/height>] [-eclevel <level>] [-noqz] [-hrt] <format> <text> <output>
 
         $command[] = __DIR__.DIRECTORY_SEPARATOR.'Generate';
+
+        if($this->format === 'png')
+        {
+            $command[] = '-size';
+            $command[] = '500';
+        }
+
         $command[] = $this->type;
         $command[] = $this->text;
         $command[] = $this->path.$this->filename;
