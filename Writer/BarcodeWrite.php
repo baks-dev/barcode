@@ -172,9 +172,8 @@ final class BarcodeWrite
         catch(ProcessFailedException $exception)
         {
             $this->logger->critical($exception->getMessage());
+            return false;
         }
-
-        return false;
     }
 
     public function render(): string
