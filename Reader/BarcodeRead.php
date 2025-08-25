@@ -230,7 +230,7 @@ final class BarcodeRead
         $imagick = new Imagick();
         $imagick->setResolution(500, 500);
         $imagick->readImage($path);
-        $imagick->borderImage(new ImagickPixel("white"), 5, 5);
+        $imagick->borderImage('white', 5, 5);
 
         // Установите цвет фона
         $imagick->setImageBackgroundColor(new ImagickPixel('white'));
