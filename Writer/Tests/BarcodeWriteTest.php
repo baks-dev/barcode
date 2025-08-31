@@ -29,15 +29,14 @@ use BaksDev\Barcode\BaksDevBarcodeBundle;
 use BaksDev\Barcode\Writer\BarcodeFormat;
 use BaksDev\Barcode\Writer\BarcodeType;
 use BaksDev\Barcode\Writer\BarcodeWrite;
+use PHPUnit\Framework\Attributes\DependsOnClass;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
 use Symfony\Component\Filesystem\Filesystem;
 
-/**
- * @group barcode
- *
- */
 #[When(env: 'test')]
+#[Group('barcode')]
 class BarcodeWriteTest extends KernelTestCase
 {
     private const string TEXT = '9ff0ff18-f3bc-7ebc-aa9c-378ff10d1e60';

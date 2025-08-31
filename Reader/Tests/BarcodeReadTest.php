@@ -28,14 +28,14 @@ namespace BaksDev\Barcode\Reader\Tests;
 use BaksDev\Barcode\Reader\BarcodeRead;
 use BaksDev\Barcode\Writer\BarcodeFormat;
 use BaksDev\Barcode\Writer\BarcodeType;
+use BaksDev\Barcode\Writer\Tests\BarcodeWriteTest;
+use PHPUnit\Framework\Attributes\DependsOnClass;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
 
-/**
- * @group barcode
- * @depends BaksDev\Barcode\Writer\Tests\BarcodeWriteTest::class
- */
 #[When(env: 'test')]
+#[Group('barcode')]
 class BarcodeReadTest extends KernelTestCase
 {
     private const string TEXT = '9ff0ff18-f3bc-7ebc-aa9c-378ff10d1e60';
@@ -47,6 +47,7 @@ class BarcodeReadTest extends KernelTestCase
         self::$BarcodeRead = self::getContainer()->get(BarcodeRead::class);
     }
 
+    #[DependsOnClass(BarcodeWriteTest::class)]
     public function testQRCodeSVG(): void
     {
         /** @var BarcodeRead $BarcodeRead */
@@ -68,7 +69,7 @@ class BarcodeReadTest extends KernelTestCase
                 'PDF417' => self::TEXT, // можно использовать произвольные строки
                 'QRCode' => self::TEXT, // можно закодировать URL, текст или другую информацию
                 'UPC-A' => '012345678905', // должен состоять из 12 цифр, включает контрольную цифру
-                'UPC-E' => '01234565' // должен состоять из 6 значащих цифр плюс 2 нуля, чтобы достичь 8 знаков
+                'UPC-E' => '01234565', // должен состоять из 6 значащих цифр плюс 2 нуля, чтобы достичь 8 знаков
             };
 
             foreach(BarcodeFormat::cases() as $format)
@@ -82,6 +83,4 @@ class BarcodeReadTest extends KernelTestCase
             }
         }
     }
-
-
 }
