@@ -227,6 +227,8 @@ final class BarcodeRead
 
         $convert = $path.'.png';
 
+        Imagick::setResourceLimit(Imagick::RESOURCETYPE_TIME, 3600);
+
         $imagick = new Imagick();
         $imagick->setResolution(500, 500);
         $imagick->readImage($path);
