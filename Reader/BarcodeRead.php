@@ -55,6 +55,32 @@ final class BarcodeRead
     {
         $this->error = false;
 
+        /**
+         * Если файла не существует - пробуем применить BLOB как png
+         */
+
+        $isDelete = false;
+
+        if(file_exists($imgSource) === false)
+        {
+            $isDelete = true;
+
+            /** Файл временный файл */
+            $path = implode(DIRECTORY_SEPARATOR, [
+                $this->upload,
+                'public',
+                'upload',
+                'barcode',
+                'tmp',
+                uniqid('', false).'.png',
+            ]);
+
+            $this->filesystem->dumpFile($path, $imgSource);
+
+            $imgSource = $path;
+        }
+
+
         /** Проверяем что файл существует по указанному абсолютному пути */
         $isExist = $this->filesystem->exists($imgSource);
 
@@ -95,13 +121,10 @@ final class BarcodeRead
             };
         }
 
-
-        /** Если файла не существует - пробуем применить BLOB как png */
+        /** Если файла не существует - возвращаем ошибку */
         else
         {
             $this->error = true;
-
-            $path = false;
             return $this;
         }
 
@@ -111,13 +134,12 @@ final class BarcodeRead
             throw new ErrorException(sprintf('Неизвестный тип %s', $fileType));
         }
 
-
         if($path)
         {
             $process = new Process([
                 __DIR__.DIRECTORY_SEPARATOR.'Decode',
                 $path,
-                '-single'
+                '-single',
             ]);
 
             $process->run();
@@ -131,17 +153,11 @@ final class BarcodeRead
             $this->decodeResult($process->getOutput());
         }
 
-
-        //        /** Если файла не имеется */
-        //        if($isExist === false)
-        //        {
-        //            $this->logger->critical(
-        //                sprintf('Файл %s не найден', $path)
-        //            );
-        //
-        //            $this->error = true;
-        //        }
-
+        /** Удаляем временный файл */
+        if(true === $isDelete)
+        {
+            $this->filesystem->remove($path);
+        }
 
         return $this;
     }
