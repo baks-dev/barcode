@@ -47,26 +47,26 @@ final class BarcodeRead
     ) {}
 
     /**
-     * Принимает абсолютный либо относительно директории
-     * <project_dir>/public/upload/barcode/tmp
-     * проекта путь к файлу
+     * Принимает абсолютный путь к файлу
+     *
+     * @example <project_dir>/public/upload/barcode/tmp
      */
     public function decode(string $imgSource): self
     {
         $this->error = false;
 
+        $isDelete = false; // флаг для удаления файла после сканирования
+
         /**
-         * Если файла не существует - пробуем применить BLOB как png
+         * Если файла не существует - пробуем сохранить BLOB в файл формата PNG
          */
 
-        $isDelete = false;
-
-        if(file_exists($imgSource) === false)
+        if(false === file_exists($imgSource))
         {
             $isDelete = true;
 
-            /** Файл временный файл */
-            $path = implode(DIRECTORY_SEPARATOR, [
+            /** Сохраняем BLOB во временный файл */
+            $tmpPath = implode(DIRECTORY_SEPARATOR, [
                 $this->upload,
                 'public',
                 'upload',
@@ -75,85 +75,58 @@ final class BarcodeRead
                 uniqid('', false).'.png',
             ]);
 
-            $this->filesystem->dumpFile($path, $imgSource);
+            $this->filesystem->dumpFile($tmpPath, $imgSource);
 
-            $imgSource = $path;
+            $imgSource = $tmpPath;
+
         }
-
 
         /** Проверяем что файл существует по указанному абсолютному пути */
-        $isExist = $this->filesystem->exists($imgSource);
 
-        if($isExist === true)
+        if(false === $this->filesystem->exists($imgSource))
         {
-            $path = $imgSource;
-        }
+            $this->logger->critical(sprintf('Файл для сканирования не найден: %s', $imgSource));
 
-        /** Если по абсолютному пути не находит - пробуем найти по относительному */
-        if($isExist === false)
-        {
-            $path = implode(DIRECTORY_SEPARATOR, [
-                $this->upload,
-                'public',
-                'upload',
-                'barcode',
-                'tmp',
-                $imgSource,
-            ]);
-
-            /** Если передан относительный директории проекта путь файла */
-            $isExist = $this->filesystem->exists($path);
-        }
-
-        if($isExist === true)
-        {
-            /** Получаем информацию о файле */
-            $info = finfo_open(FILEINFO_MIME_TYPE);
-            $fileType = finfo_file($info, $path);
-            finfo_close($info);
-
-            $path = match ($fileType)
-            {
-                'image/svg+xml', 'application/pdf' => $this->convertToPng($path),
-                'image/png' => $path,
-                'image/jpeg' => $path,
-                default => false
-            };
-        }
-
-        /** Если файла не существует - возвращаем ошибку */
-        else
-        {
             $this->error = true;
             return $this;
         }
 
+        /** Получаем информацию о файле */
+        $info = finfo_open(FILEINFO_MIME_TYPE);
+        $fileType = finfo_file($info, $imgSource);
+        finfo_close($info);
+
+        $path = match ($fileType)
+        {
+            'image/svg+xml', 'application/pdf' => $this->convertToPng($imgSource), // конвертируем SVG и PDF в PNG
+            'image/png', 'image/jpeg', 'image/jpg' => $imgSource, // PNG и JPEG
+            default => false
+        };
 
         if($path === false)
         {
             throw new ErrorException(sprintf('Неизвестный тип %s', $fileType));
         }
 
-        if($path)
+        /** Сканируем файл */
+
+        $process = new Process([
+            __DIR__.DIRECTORY_SEPARATOR.'Decode',
+            $path,
+            '-single',
+        ]);
+
+        $process->run();
+
+        if(false === empty($process->getErrorOutput()))
         {
-            $process = new Process([
-                __DIR__.DIRECTORY_SEPARATOR.'Decode',
-                $path,
-                '-single',
-            ]);
-
-            $process->run();
-
-            if(!empty($process->getErrorOutput()))
-            {
-                $this->logger->critical(sprintf('Barcode: %s', $process->getErrorOutput()));
-                $this->error = true;
-            }
-
-            $this->decodeResult($process->getOutput());
+            $this->logger->critical(sprintf('Ошибка при сканировании файла: %s', $path), [$process->getErrorOutput()]);
+            $this->error = true;
         }
 
-        /** Удаляем временный файл */
+        $this->decodeResult($process->getOutput());
+
+        /** Удаляем файл после сканирования */
         if(true === $isDelete)
         {
             $this->filesystem->remove($path);
