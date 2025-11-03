@@ -71,7 +71,7 @@ final class BarcodeWrite
             'upload',
             'barcode',
             'tmp',
-            ''
+            '',
         ]);
     }
 
@@ -111,7 +111,7 @@ final class BarcodeWrite
                 'upload',
                 'barcode',
                 'tmp',
-                ''
+                '',
             ]);
         }
 
@@ -122,7 +122,7 @@ final class BarcodeWrite
                 'public',
                 'upload',
                 $path,
-                ''
+                '',
             ]);
 
             $path = str_replace(DIRECTORY_SEPARATOR.DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR, $path);
@@ -167,13 +167,14 @@ final class BarcodeWrite
         try
         {
             $process->mustRun();
-            return true;
         }
         catch(ProcessFailedException $exception)
         {
             $this->logger->critical($exception->getMessage());
             return false;
         }
+
+        return true;
     }
 
     public function render(): string
