@@ -49,8 +49,10 @@ final class BarcodeRead
      * Принимает абсолютный путь к файлу
      *
      * @example <project_dir>/public/upload/barcode/tmp
+     *
+     * @var $decode - декодировать строку base64
      */
-    public function decode(string $imgSource): self
+    public function decode(string $imgSource, bool $decode = false): self
     {
         $this->error = false;
 
@@ -62,6 +64,11 @@ final class BarcodeRead
 
         if(false === file_exists($imgSource))
         {
+            if(true === $decode)
+            {
+                $imgSource = base64_decode($imgSource);
+            }
+
             $isDelete = true;
 
             /** Сохраняем BLOB во временный файл */
@@ -104,9 +111,8 @@ final class BarcodeRead
 
         if($path === false)
         {
+            $this->error = true;
             return $this;
-
-            //throw new ErrorException(sprintf('Неизвестный тип %s', $fileType));
         }
 
         /** Сканируем файл */
@@ -218,9 +224,10 @@ final class BarcodeRead
         $convert = $path.'.png';
 
         Imagick::setResourceLimit(Imagick::RESOURCETYPE_TIME, 3600);
+        Imagick::setResourceLimit(Imagick::RESOURCETYPE_MEMORY, (1024 * 1024 * 256));
 
         $imagick = new Imagick();
-        $imagick->setResolution(500, 500);
+        $imagick->setResolution(400, 400);
         $imagick->readImage($path);
         $imagick->borderImage('white', 5, 5);
 
