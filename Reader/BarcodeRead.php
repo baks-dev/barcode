@@ -127,7 +127,11 @@ final class BarcodeRead
 
         if(false === empty($process->getErrorOutput()))
         {
-            $this->logger->critical(sprintf('Ошибка при сканировании файла: %s', $path), [$process->getErrorOutput()]);
+            $this->logger->critical(
+                sprintf('barcode: Ошибка при сканировании файла: %s', $path),
+                [self::class.':'.__LINE__, $process->getErrorOutput()],
+            );
+
             $this->error = true;
         }
 
