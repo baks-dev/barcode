@@ -1,6 +1,6 @@
 # BaksDev Barcode
 
-[![Version](https://img.shields.io/badge/version-7.3.9-blue)](https://github.com/baks-dev/barcode/releases)
+[![Version](https://img.shields.io/badge/version-7.3.10-blue)](https://github.com/baks-dev/barcode/releases)
 ![php 8.4+](https://img.shields.io/badge/php-min%208.4-red.svg)
 [![packagist](https://img.shields.io/badge/packagist-green)](https://packagist.org/packages/baks-dev/barcode)
 
@@ -33,11 +33,16 @@ $ composer require baks-dev/barcode
 sudo apt-get install imagick php-imagick librsvg2-dev librsvg2-bin libcairo2-dev
 ```
 
+``` bash
+sudo apt install libpoppler-glib-dev
+```
+
 Делаем испольняемыми файлы
 
 ``` bash
 chmod +x .....PATH_TO_PROJECT..../vendor/baks-dev/barcode/Writer/Generate
 chmod +x .....PATH_TO_PROJECT..../vendor/baks-dev/barcode/Reader/Decode
+chmod +x .....PATH_TO_PROJECT..../vendor/baks-dev/barcode/Pdf/PdfCropImg
 ```
 
 Тесты
