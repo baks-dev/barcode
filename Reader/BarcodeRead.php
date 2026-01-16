@@ -192,6 +192,12 @@ final class BarcodeRead
         {
             // Разделяем строку по первому двоеточию
             [$key, $value] = explode(':', $line, 2);
+
+            if(empty($key) || empty($value))
+            {
+                continue;
+            }
+
             $decode[trim($key)] = trim($value);
         }
 
