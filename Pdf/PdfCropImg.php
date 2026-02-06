@@ -89,7 +89,7 @@ final class PdfCropImg
         try
         {
             $process
-                ->setTimeout(3600)
+                ->setTimeout(86400)
                 ->mustRun();
         }
         catch(ProcessFailedException $exception)
