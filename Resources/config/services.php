@@ -27,7 +27,7 @@ use BaksDev\Avito\Board\BaksDevAvitoBoardBundle;
 use BaksDev\Avito\Products\BaksDevAvitoProductsBundle;
 use BaksDev\Barcode\BaksDevBarcodeBundle;
 
-return static function (ContainerConfigurator $configurator) {
+return static function(ContainerConfigurator $configurator) {
 
     $services = $configurator->services()
         ->defaults()

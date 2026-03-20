@@ -78,9 +78,6 @@ class BarcodeReadTest extends KernelTestCase
                     ->decode(strtolower($type->value).'.'.$format->value)
                     ->getText();
 
-                //dump($decode);  /* TODO: удалить !!! */
-
-
                 //self::assertSame($text, $decode, $text.':'.$type->value.'.'.$format->value);
 
             }

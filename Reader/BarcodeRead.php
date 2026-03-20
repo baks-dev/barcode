@@ -147,26 +147,46 @@ final class BarcodeRead
     }
 
     /**
-     * Error
+     * Метод конвертируем PNG
      */
-    public function isError(): bool
+    private function convertToPng(string $path): string|false
     {
-        return $this->error;
-    }
-
-    public function getText()
-    {
-        if($this->error === false)
+        // Проверяем, что Imagick установлен
+        if(!extension_loaded('imagick'))
         {
-            return $this->decode['Text'] ?? 'Ошибка при сканировании';
+            $this->logger->critical('Imagick extension is not loaded');
+            $this->error = true;
+
+            return false;
         }
 
-        return 'Ошибка при сканировании';
-    }
+        $convert = $path.'.png';
 
-    public function isFormat(string $format)
-    {
-        return strtolower($this->decode['Format']) === $format;
+        Imagick::setResourceLimit(Imagick::RESOURCETYPE_TIME, 3600);
+        Imagick::setResourceLimit(Imagick::RESOURCETYPE_MEMORY, (1024 * 1024 * 256));
+
+        $imagick = new Imagick();
+        $imagick->setResolution(400, 400);
+        $imagick->readImage($path);
+        $imagick->borderImage('white', 5, 5);
+
+        // Установите цвет фона
+        $imagick->setImageBackgroundColor(new ImagickPixel('white'));
+
+        // Получите слои и объедините их
+        $layeredImages = $imagick->mergeImageLayers(Imagick::LAYERMETHOD_FLATTEN);
+
+        // Установите формат изображения
+        $layeredImages->setImageFormat('png');
+
+        // Сохраните результат
+        $layeredImages->writeImage($convert);
+
+        // Освобождение ресурсов
+        $layeredImages->clear();
+        $imagick->clear();
+
+        return $convert;
     }
 
     private function decodeResult(string $result): void
@@ -216,48 +236,27 @@ final class BarcodeRead
         $this->error = true;
     }
 
-
     /**
-     * Метод конвертируем PNG
+     * Error
      */
-    private function convertToPng(string $path): string|false
+    public function isError(): bool
     {
-        // Проверяем, что Imagick установлен
-        if(!extension_loaded('imagick'))
-        {
-            $this->logger->critical('Imagick extension is not loaded');
-            $this->error = true;
+        return $this->error;
+    }
 
-            return false;
+    public function getText()
+    {
+        if($this->error === false)
+        {
+            return $this->decode['Text'] ?? 'Ошибка при сканировании';
         }
 
-        $convert = $path.'.png';
+        return 'Ошибка при сканировании';
+    }
 
-        Imagick::setResourceLimit(Imagick::RESOURCETYPE_TIME, 3600);
-        Imagick::setResourceLimit(Imagick::RESOURCETYPE_MEMORY, (1024 * 1024 * 256));
-
-        $imagick = new Imagick();
-        $imagick->setResolution(400, 400);
-        $imagick->readImage($path);
-        $imagick->borderImage('white', 5, 5);
-
-        // Установите цвет фона
-        $imagick->setImageBackgroundColor(new ImagickPixel('white'));
-
-        // Получите слои и объедините их
-        $layeredImages = $imagick->mergeImageLayers(Imagick::LAYERMETHOD_FLATTEN);
-
-        // Установите формат изображения
-        $layeredImages->setImageFormat('png');
-
-        // Сохраните результат
-        $layeredImages->writeImage($convert);
-
-        // Освобождение ресурсов
-        $layeredImages->clear();
-        $imagick->clear();
-
-        return $convert;
+    public function isFormat(string $format)
+    {
+        return strtolower($this->decode['Format']) === $format;
     }
 
 

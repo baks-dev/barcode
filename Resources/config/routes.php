@@ -1,17 +1,17 @@
 <?php
 /*
  *  Copyright 2024.  Baks.dev <admin@baks.dev>
- *
+ *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
  *  in the Software without restriction, including without limitation the rights
  *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  *  copies of the Software, and to permit persons to whom the Software is furnished
  *  to do so, subject to the following conditions:
- *
+ *  
  *  The above copyright notice and this permission notice shall be included in all
  *  copies or substantial portions of the Software.
- *
+ *  
  *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  *  FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,43 +21,20 @@
  *  THE SOFTWARE.
  */
 
-declare(strict_types=1);
+use BaksDev\Barcode\BaksDevBarcodeBundle;
+use BaksDev\Delivery\BaksDevDeliveryBundle;
+use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 
-namespace BaksDev\Barcode\Commands;
+return function(RoutingConfigurator $routes) {
 
-use BaksDev\Barcode\Reader\BarcodeRead;
-use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
+    $MODULE = BaksDevBarcodeBundle::PATH;
 
-#[AsCommand(
-    name: 'baks:barcode:write',
-    description: 'Описание комманды'
-)]
-class BarcodeReadCommand extends Command
-{
-    public function __construct(private readonly BarcodeRead $barcodeRead)
-    {
-        parent::__construct();
-    }
-
-    protected function configure(): void
-    {
-
-        $this->barcodeRead->decode('5465');
-
-        $this->addArgument('argument', InputArgument::OPTIONAL, 'Описание аргумента');
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
-        $io = new SymfonyStyle($input, $output);
-
-        $io->success('baks:barcode:write');
-
-        return Command::SUCCESS;
-    }
-}
+    $routes->import(
+        $MODULE.'Controller',
+        'attribute',
+        false,
+        $MODULE.implode(DIRECTORY_SEPARATOR, ['Controller', '**', '*Test.php']),
+    )
+        ->prefix(\BaksDev\Core\Type\Locale\Locale::routes())
+        ->namePrefix('barcode:');
+};

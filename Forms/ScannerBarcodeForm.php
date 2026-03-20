@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -23,41 +23,29 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Barcode\Commands;
+namespace BaksDev\Barcode\Forms;
 
-use BaksDev\Barcode\Reader\BarcodeRead;
-use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 
-#[AsCommand(
-    name: 'baks:barcode:write',
-    description: 'Описание комманды'
-)]
-class BarcodeReadCommand extends Command
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+
+final class ScannerBarcodeForm extends AbstractType
 {
-    public function __construct(private readonly BarcodeRead $barcodeRead)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        parent::__construct();
+        $builder->add('code', HiddenType::class);
     }
 
-    protected function configure(): void
+    public function configureOptions(OptionsResolver $resolver): void
     {
-
-        $this->barcodeRead->decode('5465');
-
-        $this->addArgument('argument', InputArgument::OPTIONAL, 'Описание аргумента');
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
-        $io = new SymfonyStyle($input, $output);
-
-        $io->success('baks:barcode:write');
-
-        return Command::SUCCESS;
+        $resolver->setDefaults([
+            'data_class' => ScannerBarcodeDTO::class,
+            'method' => 'POST',
+            'attr' => ['class' => 'w-100'],
+        ]);
     }
 }

@@ -177,6 +177,12 @@ final class BarcodeWrite
         return true;
     }
 
+    public function remove(): self
+    {
+        $this->filesystem->remove($this->path.$this->filename);
+        return $this;
+    }
+
     public function render(): string
     {
 
@@ -188,16 +194,9 @@ final class BarcodeWrite
         return $this->filesystem->readFile($this->path.$this->filename);
     }
 
-
     /** Метод возвращает пусть к файлу */
     public function getPath(): string
     {
         return $this->path;
-    }
-
-    public function remove(): self
-    {
-        $this->filesystem->remove($this->path.$this->filename);
-        return $this;
     }
 }

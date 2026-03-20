@@ -1,0 +1,36 @@
+{% trans_default_domain("delivery.admin") %}
+
+{% set ROLE = 'ROLE_DELIVERY' %}
+
+{# ---- ШАБЛОН ------------------------------------------------------------ #}
+{% extends Template('/admin/base.html.twig') %}
+
+{# ---- CSS ------------------------------------------------------------ #}
+{% block title %}
+    {{ 'page.index'|trans }}
+{% endblock %}
+
+{% block styleshets %}
+    {{ 'page.index'|trans }}
+{% endblock %}
+
+
+{# ---- КОНТЕНТ-БЛОК ------------------------------------------------------------ #}
+{% block content %}
+
+    <main class="main d-print-none vh-100 bg-black">
+        <div id="qr-reader"></div>
+        {{ form(form) }}
+    </main>
+
+{% endblock %}
+
+
+{# ---- КОНТЕНТ-БЛОК ------------------------------------------------------------ #}
+{% block javascript %}
+
+<script nonce='{{ csp_nonce() }}' async data-src='/assets/{{ version }}/barcode/reader.min.js?v={{ version }}' class='lazy'></script>
+<script nonce='{{ csp_nonce() }}' async data-src='/assets/{{ version }}/barcode/barcode.min.js?v={{ version }}' class='lazy' ></script>
+
+{% endblock %}
+
