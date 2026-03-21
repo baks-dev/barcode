@@ -77,17 +77,17 @@ final class ScannerController extends AbstractController
             $ScannerMessage = new ScannerMessage($ScannerDTO->getCode());
             $messageDispatch->dispatch($ScannerMessage);
 
+            if(empty($ScannerMessage->getContent()))
+            {
+                return $this->render(
+                    module: 'barcode',
+                    dir: '/scanner',
+                    file: 'error.html.twig',
+                );
+            }
 
-            return new Response('<div class="modal-dialog modal-dialog-centered modal-fullscreen" style="max-width: 800px;"><form name="product_delete_form" method="post" action="/admin/product/delete/019cd7de-bc2b-751b-a9c0-e7a785f8f2b2" class="w-100"><div class="modal-content p-3 border-bottom border-5 border-danger"><div class="modal-header"><h5 class="modal-title"> Удалить продукцию
-</h5><div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
-<span class="svg-icon svg-icon-2x"></span></div></div><div class="modal-body">
-<h4> Вы уверены, что желаете удалить "'.$ScannerDTO->getCode().'"?
-</h4><br><p> Убедитесь, что выбран именно тот объект, который нужно удалить, и нажмите Удалить. Если Вы не желаете удалять выбранный объект, нажмите кнопку Отмена.
-</p></div><div class="modal-footer"><div class="flex-grow-1"> &nbsp;
-</div><div class="d-flex gap-3"><button type="button" class="btn btn-light" data-bs-dismiss="modal"> Отмена
-</button><button type="submit" id="product_delete_form_delete" name="product_delete_form[delete]" class="btn-danger btn"><span>Удалить</span><span class="spinner-border spinner-border-sm vertical-middle d-none"></span></button></div></div></div><input type="hidden" id="product_delete_form__token" name="product_delete_form[_token]" data-controller="csrf-protection" value="5e3dc5176feb9cc1153a7e444c.ObXw6i8YiYyJYWwQ9aeoxXt8rc0wARvc9NPYLWPuvEY.bPCSi1t_3vvmEgZJnv7fmkgR5ItbN0SEo-CQQw2q-gUJ76-MbW_I2eUOLQ"></form></div>');
 
-            return new Response('********'.$ScannerDTO->getCode().'***********');
+            return new Response($ScannerMessage->getContent());
 
         }
 

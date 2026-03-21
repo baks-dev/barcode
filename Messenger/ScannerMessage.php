@@ -26,12 +26,25 @@ declare(strict_types=1);
 namespace BaksDev\Barcode\Messenger;
 
 
-final readonly class ScannerMessage
+final  class ScannerMessage
 {
-    public function __construct(private string $identifier) {}
+    private string|null $content = null;
+
+    public function __construct(private readonly string $identifier) {}
 
     public function getIdentifier(): string
     {
         return $this->identifier;
+    }
+
+    public function setContent(?string $content): self
+    {
+        $this->content = $content;
+        return $this;
+    }
+
+    public function getContent(): ?string
+    {
+        return $this->content;
     }
 }

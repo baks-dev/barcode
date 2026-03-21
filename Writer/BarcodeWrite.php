@@ -58,6 +58,8 @@ final class BarcodeWrite
 
     )
     {
+
+
         /** По умолчанию генерируемый QRCode */
         $this->type = (BarcodeType::QRCode)->value;
 

@@ -174,20 +174,23 @@ async function sendCodeToServer(qrText)
                 /* Сбрасываем содержимое модального окна при закрытии */
                 modal.addEventListener("hidden.bs.modal", function(event)
                 {
-                    this.innerHTML = "<div class=\"modal-dialog modal-dialog-centered modal-xl\">\n" +
-                        "        <div class=\"modal-content border-0 bg-transparent shadow-none\">\n" +
-                        "            <div class=\"d-flex justify-content-center w-100\">\n" +
-                        "                <button type=\"button\" class=\"btn btn-link w-100\" style=\"min-height: 500px;\" data-bs-dismiss=\"modal\">\n" +
-                        "                    <div class=\"spinner-border text-light\" role=\"status\">\n" +
-                        "                        <span class=\"visually-hidden\">Loading...</span>\n" +
-                        "                    </div>\n" +
-                        "                </button>\n" +
-                        "            </div>\n" +
-                        "        </div>\n" +
-                        "    </div>";
-
                     location.reload();
                 });
+
+                modal.querySelectorAll("form").forEach(function(forms)
+                {
+
+                    /* событие отправки формы */
+                    forms.addEventListener("submit", function(event)
+                    {
+                        event.preventDefault();
+                        submitModalForm(forms);
+                        return false;
+                    });
+                });
+
+                let lazy = document.createElement("script");
+                lazy.src = "/assets/" + $version + "/js/lazyload.min.js?v=" + Date.now();
             })
         ;
 
