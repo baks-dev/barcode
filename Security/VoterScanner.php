@@ -25,7 +25,6 @@ declare(strict_types=1);
 
 namespace BaksDev\Barcode\Security;
 
-use BaksDev\Contacts\Region\Security\Role;
 use BaksDev\Users\Profile\Group\Security\RoleInterface;
 use BaksDev\Users\Profile\Group\Security\VoterInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
