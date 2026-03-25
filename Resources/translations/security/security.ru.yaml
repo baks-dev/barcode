@@ -1,0 +1,9 @@
+ROLE_BARCODE:
+  name: 'Сканер штрихкода'
+  desc: ''
+
+ROLE_BARCODE_SCANNER:
+  name: 'Сканирование'
+  desc: ''
+
+

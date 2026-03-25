@@ -41,7 +41,7 @@ use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[AsController]
-/*#[RoleSecurity('ROLE_BARCODE')]*/
+#[RoleSecurity('ROLE_BARCODE_SCANNER')]
 final class ScannerController extends AbstractController
 {
     #[Route('/scanner', name: 'scanner', methods: ['GET', 'POST'])]
