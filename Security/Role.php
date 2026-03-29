@@ -29,7 +29,6 @@ use BaksDev\Users\Profile\Group\Security\RoleInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 #[AutoconfigureTag('baks.security.role')]
-#[AutoconfigureTag('baks.menu.admin')]
 final class Role implements RoleInterface
 {
     public const string ROLE = 'ROLE_BARCODE';
