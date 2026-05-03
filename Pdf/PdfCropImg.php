@@ -58,7 +58,7 @@ final class PdfCropImg
         return $this;
     }
 
-    public function crop(string $save): bool
+    public function crop(string|null|false $save = false): bool
     {
         if(false === $this->filesystem->exists($this->path))
         {
@@ -68,9 +68,19 @@ final class PdfCropImg
 
         $filepath = sprintf('%s'.DIRECTORY_SEPARATOR.'%s', $this->path, $this->filename);
 
-        /** Создаем директорию для изображений */
-        $save = $this->path.DIRECTORY_SEPARATOR.$save;
-        $this->filesystem->mkdir($save);
+
+        /** Сохраняем в ту же директорию изображение */
+        if(true === empty($save))
+        {
+            $save = $this->path;
+        }
+
+        /** Создаем отдельно директорию для изображений */
+        if(false === empty($save))
+        {
+            $save = $this->path.DIRECTORY_SEPARATOR.$save;
+            $this->filesystem->mkdir($save);
+        }
 
 
         //  pdfimgcrop
