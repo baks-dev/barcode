@@ -254,6 +254,73 @@ final class BarcodeRead
         return 'Ошибка при сканировании';
     }
 
+    public function getDataMatrixText()
+    {
+        /** Если имеется ошибка */
+        if(false === empty($this->error))
+        {
+            return 'Ошибка при сканировании';
+        }
+
+        /** Если в тексте пустое значение */
+        if(true === empty($this->decode['Text']))
+        {
+            return 'Ошибка при сканировании';
+        }
+
+        /** Если текст начинается с 01...21 - преобразуем */
+        if(preg_match('/^01\d{14}21/', $this->decode['Text']))
+        {
+            $code = $this->decode['Text'];
+
+            $clean = str_replace(['', '<GS>', '<LF>', "\x1D", "\n", "\r"], '', $code);
+            $res = '';
+            $off = 0;
+
+            $len = strlen($clean);
+
+            if(str_starts_with($clean, '01') && $len > 16)
+            {
+                $res .= '(01)'.substr($clean, 2, 14);
+                $off = 16;
+            }
+
+            if(substr($clean, $off, 2) === '21')
+            {
+                $off += 2;
+                $end = $len;
+                foreach(['91', '92'] as $ai)
+                {
+                    $p = strpos($clean, $ai, $off);
+                    if($p !== false)
+                        $end = min($end, $p);
+                }
+                $res .= '(21)'.substr($clean, $off, $end - $off);
+                $off = $end;
+            }
+
+            if(substr($clean, $off, 2) === '91')
+            {
+                $off += 2;
+                $p92 = strpos($clean, '92', $off);
+                $end = $p92 !== false ? $p92 : $len;
+                $res .= '(91)'.substr($clean, $off, $end - $off);
+                $off = $end;
+            }
+
+            if(substr($clean, $off, 2) === '92')
+            {
+                $res .= '(92)'.substr($clean, $off + 2);
+            }
+
+
+            $this->decode['Text'] = $res;
+        }
+
+        return $this->decode['Text'];
+    }
+
+
     public function isFormat(string $format)
     {
         return strtolower($this->decode['Format']) === $format;
